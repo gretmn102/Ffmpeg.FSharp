@@ -1,4 +1,4 @@
-module Ffmpeg.FSharp.Ffprob
+module Ffmpeg.FSharp.Ffprobe
 
 let ffprobPath = "ffprobe"
 
