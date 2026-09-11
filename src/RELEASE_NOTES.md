@@ -1,3 +1,8 @@
+## 0.3.0
+
+* fix(Bash.toDoubleQuote): `\` -> `\\\\`
+* refactor!: rename `Ffprob` to `Ffprobe`
+
 ## 0.2.0
 
 * refactor!: rename `FfMpeg` to `Ffmpeg`
