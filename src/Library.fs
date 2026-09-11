@@ -1,6 +1,6 @@
 ﻿namespace Ffmpeg.FSharp
 
-module FfMpeg =
+module Ffmpeg =
     let ffmpegPath = "ffmpeg"
 
     let startProc args =
