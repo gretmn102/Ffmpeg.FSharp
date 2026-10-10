@@ -15,10 +15,12 @@ type Metadata = {
     album: string option
     // album artist // `album_artist`, а еще есть `performer`
     // `comment`
+    chapters: Chapter list
 }
 
 module Metadata =
     open FsharpMyExtension.Primitives.Numeric
+    open FsharpMyExtension.Serialization.Serializers.ShowList
 
     let toArgs (metadata: Metadata) =
         let escape =
@@ -61,6 +63,17 @@ module Metadata =
                 $"-metadata album=\"{escape album}\""
             | None -> ()
         ]
+
+    /// сохраняет только `chapters`!
+    let toFileFormat (metadata: Metadata) =
+        [
+            showString ";FFMETADATA1"
+            yield!
+                metadata.chapters
+                |> List.collect Chapter.Printer.show
+        ]
+        |> joinsEmpty nl
+        |> show
 
     let toFileName (metadata: Metadata) =
         let escape =
