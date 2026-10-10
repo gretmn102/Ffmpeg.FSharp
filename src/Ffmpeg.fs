@@ -125,37 +125,67 @@ type Options = {
 }
 
 module Options =
-    let toArgs (options: Options) = [
-            if options.OverwriteOutput then
-                "-y"
+    let toArgs (options: Options) =
+        let metadataPathOpt =
+            options.Metadata
+            |> Option.bind (fun metadata ->
+                if List.isEmpty metadata.chapters then
+                    None
+                else
+                    let result = Metadata.toFileFormat metadata
+                    let path = System.IO.Path.GetTempFileName()
+                    System.IO.File.WriteAllText(path, result)
+                    Some path
+            )
+        {|
+            MetadataPath = metadataPathOpt
+            Args =
+                [
+                    match metadataPathOpt with
+                    | Some metadataPath ->
+                        $"-i {Bash.toDoubleQuote metadataPath}"
+                    | None -> ()
 
-            match options.Start with
-            | Some startAt -> $"-ss \"{startAt}\""
-            | None -> ()
+                    if options.OverwriteOutput then
+                        "-y"
 
-            match options.End with
-            | Some endAt -> $"-to \"{endAt}\""
-            | None -> ()
+                    if Option.isSome metadataPathOpt then
+                        "-map_metadata 1"
 
-            match options.Metadata with
-            | Some metadata ->
-                yield! Metadata.toArgs metadata
-            | None -> ()
+                    match options.Start with
+                    | Some startAt -> $"-ss \"{startAt}\""
+                    | None -> ()
 
-            if options.ASync then
-                "-async 1"
+                    match options.End with
+                    | Some endAt -> $"-to \"{endAt}\""
+                    | None -> ()
 
-            if options.CopyAudio then
-                "-c:a copy"
+                    match options.Metadata with
+                    | Some metadata ->
+                        yield! Metadata.toArgs metadata
+                    | None -> ()
 
-            if options.CopyVideo then
-                "-c:v copy"
-    ]
+                    if options.ASync then
+                        "-async 1"
+
+                    if options.CopyAudio then
+                        "-c:a copy"
+
+                    if options.CopyVideo then
+                        "-c:v copy"
+                ]
+        |}
 
 let start (input: string) (options: Options) (output: string) =
-    startProc
-        (String.concat " " [
+    let args = Options.toArgs options
+    let result =
+        startProc (String.concat " " [
             $"-i \"{input}\""
-            yield! Options.toArgs options
+            yield! args.Args
             $"\"{output}\""
         ])
+    args.MetadataPath
+    |> Option.iter (fun path ->
+        System.IO.File.Delete path
+    )
+    result
