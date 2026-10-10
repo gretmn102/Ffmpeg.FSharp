@@ -149,9 +149,6 @@ module Options =
                     if options.OverwriteOutput then
                         "-y"
 
-                    if Option.isSome metadataPathOpt then
-                        "-map_metadata 1"
-
                     match options.Start with
                     | Some startAt -> $"-ss \"{startAt}\""
                     | None -> ()
@@ -159,6 +156,9 @@ module Options =
                     match options.End with
                     | Some endAt -> $"-to \"{endAt}\""
                     | None -> ()
+
+                    if Option.isSome metadataPathOpt then
+                        "-map_metadata 1"
 
                     match options.Metadata with
                     | Some metadata ->
