@@ -38,8 +38,8 @@ module Chapter =
         let show (chapter: Chapter) : ShowS list =
             [
                 showString "[CHAPTER]"
-                showString "TIMEBASE" << IntFraction.Printer.show chapter.TimeBase
-                showString "START" << showByToString chapter.Start
-                showString "END" << showByToString chapter.End
-                showString "TITLE" << showByToString chapter.Title
+                showString "TIMEBASE" << showChar '=' << IntFraction.Printer.show chapter.TimeBase
+                showString "START" << showChar '=' << showByToString chapter.Start
+                showString "END" << showChar '=' << showByToString chapter.End
+                showString "TITLE" << showChar '=' << showByToString chapter.Title
             ]
